@@ -4,7 +4,7 @@ type TrimmedLink struct {
 	ID      uint `gorm:"primaryKey"`
 	Link    string
 	Trimmed string
-	UserId  uint `gorm:"foreignKey:ID" json:"sessions"`
+	UserId  uint
 }
 
 type User struct {

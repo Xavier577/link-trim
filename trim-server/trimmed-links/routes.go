@@ -2,11 +2,10 @@ package trimmedlinks
 
 import "github.com/gin-gonic/gin"
 
-var userController = new(UserController)
+var trimmedLinkController = new(TrimmedLinkController)
 
 func Routes(router *gin.RouterGroup) {
-
-	router.GET("/trimmed-link/:id", userController.GetTrimmedLink)
-	router.POST("/trimmed-link/create", userController.CreateTrimmedLink)
+	router.GET(":id", trimmedLinkController.GetTrimmedLink)
+	router.POST("create", trimmedLinkController.CreateTrimmedLink)
 
 }

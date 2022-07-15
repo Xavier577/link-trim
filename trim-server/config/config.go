@@ -13,9 +13,9 @@ func RoutesConfig(router *gin.Engine) {
 	v1 := router.Group("/api/v1")
 
 	{
-		auth.Routes(v1)
-		users.Routes(v1)
-		trimmedlinks.Routes(v1)
+		auth.Routes(v1.Group("/auth"))
+		users.Routes(v1.Group("/user"))
+		trimmedlinks.Routes(v1.Group("/trimmed-link"))
 	}
 }
 

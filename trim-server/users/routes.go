@@ -7,7 +7,7 @@ import (
 var userController = new(UserController)
 
 func Routes(router *gin.RouterGroup) {
-	router.GET("user/all", userController.GetAllUsers)
-	router.GET("/user/:id", userController.GetUser)
-	router.POST("/user/create", userController.Create)
+	router.GET("all", userController.GetAllUsers)
+	router.GET(":id", userController.GetUser)
+	router.POST("create", userController.Create)
 }

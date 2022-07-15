@@ -6,15 +6,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserController struct{}
+type TrimmedLinkController struct{}
 
 var trimmedLinkService = new(TrimmedLinkService)
 
-func (userController *UserController) GetTrimmedLink(context *gin.Context) {
+func (trimmedLinkController *TrimmedLinkController) GetTrimmedLink(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"message": "comming soon"})
 }
 
-func (UserController *UserController) CreateTrimmedLink(context *gin.Context) {
+func (UserController *TrimmedLinkController) CreateTrimmedLink(context *gin.Context) {
 
 	var createTrimmedLinkDto *CreateTrimmedLinkDto
 
