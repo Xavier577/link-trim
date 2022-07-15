@@ -1,4 +1,4 @@
-package shared
+package config
 
 import (
 	"example/trim-server/auth"
@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func RoutesModule(router *gin.Engine) {
+func RoutesConfig(router *gin.Engine) {
 	v1 := router.Group("/api/v1")
 
 	{
@@ -19,7 +19,7 @@ func RoutesModule(router *gin.Engine) {
 	}
 }
 
-func RepositoryModule(db_driver *gorm.DB) {
+func RepositoryInitializer(db_driver *gorm.DB) {
 	users.InitializeUserRepository(db_driver)
 	trimmedlinks.InitializeLinkRepository(db_driver)
 }

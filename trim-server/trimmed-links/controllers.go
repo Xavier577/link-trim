@@ -1,28 +1,34 @@
 package trimmedlinks
 
 import (
-	"fmt"
-	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetTrimmedLink(context *gin.Context) {
-	link_id, err := strconv.Atoi(context.Params.ByName("id"))
+type UserController struct{}
 
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid params"})
+var trimmedLinkService = new(TrimmedLinkService)
+
+func (userController *UserController) GetTrimmedLink(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{"message": "comming soon"})
+}
+
+func (UserController *UserController) CreateTrimmedLink(context *gin.Context) {
+
+	var createTrimmedLinkDto *CreateTrimmedLinkDto
+
+	if err := context.ShouldBind(&createTrimmedLinkDto); err != nil {
+		context.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	affected, err := getLinkById(uint(link_id), new(LinkRepositoryStruct))
+	trimmedLink, err := trimmedLinkService.CreateTrimmedLink(createTrimmedLinkDto)
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
-		log.Fatal(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error!"})
+		return
 	}
 
-	context.String(http.StatusOK, fmt.Sprint(affected))
+	context.JSON(http.StatusOK, trimmedLink)
 }

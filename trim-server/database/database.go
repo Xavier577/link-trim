@@ -1,7 +1,7 @@
 package database
 
 import (
-	"example/trim-server/config"
+	"example/trim-server/global"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -10,7 +10,7 @@ import (
 func Connect() *gorm.DB {
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  config.Env("DB_URL"),
+		DSN:                  global.Env("DB_URL"),
 		PreferSimpleProtocol: true,
 	}), &gorm.Config{})
 

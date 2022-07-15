@@ -1,15 +1,23 @@
 package users
 
-import "example/trim-server/hasher"
+import (
+	"example/trim-server/database"
+	"example/trim-server/hasher"
+)
 
-type UserServiceStruct struct{}
+type UserService struct{}
 
-func (userService *UserServiceStruct) FindUser(id string) string {
-	return id
+var userRepository = new(UserRepository)
+
+func (userService *UserService) FindUser(id uint) (bool, database.User, error) {
+	return userRepository.FindUser(id)
 }
 
-func (userService *UserServiceStruct) CreateUser(userDto *CreateUserDto) bool {
+func (UserService *UserService) FindMany() (bool, []database.User, error) {
+	return userRepository.FindMany()
+}
 
+func (userService *UserService) CreateUser(userDto *CreateUserDto) (bool, database.User, error) {
 	passHash, err := hasher.Hash(userDto.Password)
 
 	if err != nil {
@@ -18,9 +26,6 @@ func (userService *UserServiceStruct) CreateUser(userDto *CreateUserDto) bool {
 
 	userDto.Password = passHash
 
-	isCreated := userRepository.CreateUser(userDto)
+	return userRepository.CreateUser(userDto)
 
-	return isCreated
 }
-
-var userService = new(UserServiceStruct)

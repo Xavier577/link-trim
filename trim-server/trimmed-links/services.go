@@ -1,8 +1,25 @@
 package trimmedlinks
 
-func getLinkById(id uint, linkRepo ILinkRepository) (int64, error) {
+import (
+	"example/trim-server/database"
+	"example/trim-server/global"
+)
 
-	link := linkRepo.FindLink(id)
+type TrimmedLinkService struct{}
 
-	return link.RowsAffected, link.Error
+var trimmedLinkRepository = new(TrimmedLinkRepository)
+
+func (trimmedLinkService *TrimmedLinkService) FetchTrimmedLink() string {
+	return "trimmed link"
+}
+
+func (trimmedLinkService *TrimmedLinkService) CreateTrimmedLink(createTrimmedLinkDto *CreateTrimmedLinkDto) (database.TrimmedLink, error) {
+	trimmedLink, err := global.UUID()
+
+	if err != nil {
+		panic(err)
+	}
+
+	createTrimmedLinkDto.TrimmedUrl = trimmedLink
+	return trimmedLinkRepository.CreatedTrimmedLink(createTrimmedLinkDto)
 }

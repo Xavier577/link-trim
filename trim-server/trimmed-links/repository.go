@@ -1,6 +1,7 @@
 package trimmedlinks
 
 import (
+	"errors"
 	"example/trim-server/database"
 
 	"gorm.io/gorm"
@@ -17,14 +18,30 @@ func InitializeLinkRepository(db_driver *gorm.DB) {
 	}
 }
 
-type LinkRepositoryStruct struct{}
+type TrimmedLinkRepository struct{}
 
-type ILinkRepository interface {
-	FindLink(id uint) *gorm.DB
+func (linkRepo *TrimmedLinkRepository) CreatedTrimmedLink(createLinkDto *CreateTrimmedLinkDto) (database.TrimmedLink, error) {
+	trimmedLink := database.TrimmedLink{UserId: createLinkDto.UserId,
+		Link:    createLinkDto.LinkUrl,
+		Trimmed: createLinkDto.TrimmedUrl}
+	result := db.Create(&trimmedLink)
+
+	return trimmedLink, result.Error
+
 }
 
-func (linkRepo *LinkRepositoryStruct) FindLink(id uint) *gorm.DB {
-	result := db.First(&database.TrimmedLink{ID: id})
-
-	return result
+func (linkRepo *TrimmedLinkRepository) FindTrimmedLink(id uint) (bool, database.TrimmedLink, error) {
+	var trimmedLink database.TrimmedLink
+	result := db.First(trimmedLink, &database.TrimmedLink{ID: id})
+	isNotFoundErr := errors.Is(result.Error, gorm.ErrRecordNotFound)
+	err := result.Error
+	return isNotFoundErr, trimmedLink, err
 }
+
+// func (linkRepo *TrimmedLinkRepository) FindAllTrimmedLinks() {
+
+// }
+
+// func (linkRepo *TrimmedLinkRepository) FindUsersTrimmedLink(userId uint) {
+
+// }

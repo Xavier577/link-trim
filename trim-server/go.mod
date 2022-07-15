@@ -3,6 +3,7 @@ module example/trim-server
 go 1.13
 
 require (
+	github.com/aidarkhanov/nanoid/v2 v2.0.5 // indirect
 	github.com/gin-gonic/gin v1.8.1
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/joho/godotenv v1.4.0

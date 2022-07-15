@@ -2,15 +2,15 @@ package database
 
 type TrimmedLink struct {
 	ID      uint `gorm:"primaryKey"`
-	User    User
-	UserId  string
 	Link    string
 	Trimmed string
+	UserId  uint `gorm:"foreignKey:ID" json:"sessions"`
 }
 
 type User struct {
-	ID       uint `gorm:"primaryKey"`
-	Username string
-	Email    string
-	Password string
+	ID           uint `gorm:"primaryKey"`
+	Username     string
+	Email        string
+	Password     string
+	TrimmedLinks []TrimmedLink
 }

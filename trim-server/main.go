@@ -3,19 +3,18 @@ package main
 import (
 	"example/trim-server/config"
 	"example/trim-server/database"
-	"example/trim-server/shared"
+	"example/trim-server/global"
 
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-
-	router := gin.Default()
-	shared.RoutesModule(router)
-
+func init() {
 	db := database.Connect()
+	config.RepositoryInitializer(db)
+}
 
-	shared.RepositoryModule(db)
-
-	router.Run(config.Env("ADDRESS"))
+func main() {
+	router := gin.Default()
+	config.RoutesConfig(router)
+	router.Run(global.Env("ADDRESS"))
 }

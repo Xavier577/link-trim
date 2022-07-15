@@ -1,10 +1,14 @@
 package users
 
 import (
+	"errors"
 	"example/trim-server/database"
+	"fmt"
 
 	"gorm.io/gorm"
 )
+
+type UserRepository struct{}
 
 var db *gorm.DB
 
@@ -17,26 +21,30 @@ func InitializeUserRepository(db_driver *gorm.DB) {
 	}
 }
 
-type UserRepositoryStruct struct{}
-
-type IUserRepository interface {
-	FindUser(id string) *gorm.DB
-	CreateUser() bool
+func (userRepo *UserRepository) FindUser(id uint) (bool, database.User, error) {
+	var user database.User
+	result := db.Take(&user, id)
+	isNotFoundErr := errors.Is(result.Error, gorm.ErrRecordNotFound)
+	err := result.Error
+	return isNotFoundErr, user, err
 }
 
-func (userRepo *UserRepositoryStruct) FindUser(id uint) *gorm.DB {
-	result := db.First(&database.User{ID: id})
-	return result
+func (userRepo *UserRepository) FindMany() (bool, []database.User, error) {
+	var users []database.User
+	result := db.Find(&users)
+	isNotFoundErr := errors.Is(result.Error, gorm.ErrRecordNotFound)
+	err := result.Error
+	return isNotFoundErr, users, err
 }
 
-func (userRepo *UserRepositoryStruct) CreateUser(userDto *CreateUserDto) bool {
-	result := db.Model(&database.User{}).Create(map[string]interface{}{
-		"Username": userDto.Username,
-		"Email":    userDto.Email,
-		"Password": userDto.Password,
-	})
+func (userRepo *UserRepository) CreateUser(userDto *CreateUserDto) (bool, database.User, error) {
+	user := database.User{Username: userDto.Username,
+		Email:    userDto.Email,
+		Password: userDto.Password}
+	result := db.Or(database.User{Username: userDto.Username,
+		Email: userDto.Email}).FirstOrCreate(&user)
+	userAlreadyExists := user.ID == 0
 
-	return result.Error == nil
+	fmt.Println(userAlreadyExists)
+	return userAlreadyExists, user, result.Error
 }
-
-var userRepository = new(UserRepositoryStruct)
