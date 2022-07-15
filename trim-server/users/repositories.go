@@ -14,10 +14,10 @@ var db *gorm.DB
 
 func InitializeUserRepository(db_driver *gorm.DB) {
 	db = db_driver
-	error := db_driver.AutoMigrate(&database.User{})
+	err := db_driver.AutoMigrate(&database.User{})
 
-	if error != nil {
-		panic(error)
+	if err != nil {
+		panic(err)
 	}
 }
 
