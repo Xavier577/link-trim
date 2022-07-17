@@ -2,6 +2,7 @@ package users
 
 import (
 	"example/trim-server/global"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,6 +42,7 @@ func (userController *UserController) GetAllUsers(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
+		log.Default().Println(err.Error())
 		return
 	}
 

@@ -24,6 +24,7 @@ func (linkRepo *TrimmedLinkRepository) CreatedTrimmedLink(createLinkDto *CreateT
 	trimmedLink := database.TrimmedLink{UserId: createLinkDto.UserId,
 		Link:    createLinkDto.LinkUrl,
 		Trimmed: createLinkDto.TrimmedUrl}
+
 	result := db.Create(&trimmedLink)
 
 	return trimmedLink, result.Error

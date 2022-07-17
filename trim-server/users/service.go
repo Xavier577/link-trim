@@ -3,6 +3,7 @@ package users
 import (
 	"example/trim-server/database"
 	"example/trim-server/hasher"
+	"fmt"
 )
 
 type UserService struct{}
@@ -10,7 +11,7 @@ type UserService struct{}
 var userRepository = new(UserRepository)
 
 func (userService *UserService) FindUser(id uint) (bool, database.User, error) {
-	return userRepository.FindUser(id)
+	return userRepository.FindUserById(id)
 }
 
 func (UserService *UserService) FindMany() (bool, []database.User, error) {
@@ -21,7 +22,8 @@ func (userService *UserService) CreateUser(userDto *CreateUserDto) (bool, databa
 	passHash, err := hasher.Hash(userDto.Password)
 
 	if err != nil {
-		panic(err)
+		fmt.Println("hash error")
+		panic(err.Error())
 	}
 
 	userDto.Password = passHash

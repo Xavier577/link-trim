@@ -3,7 +3,6 @@ package users
 import (
 	"errors"
 	"example/trim-server/database"
-	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -21,7 +20,7 @@ func InitializeUserRepository(db_driver *gorm.DB) {
 	}
 }
 
-func (userRepo *UserRepository) FindUser(id uint) (bool, database.User, error) {
+func (userRepo *UserRepository) FindUserById(id uint) (bool, database.User, error) {
 	var user database.User
 	result := db.Take(&user, id)
 	isNotFoundErr := errors.Is(result.Error, gorm.ErrRecordNotFound)
@@ -31,20 +30,31 @@ func (userRepo *UserRepository) FindUser(id uint) (bool, database.User, error) {
 
 func (userRepo *UserRepository) FindMany() (bool, []database.User, error) {
 	var users []database.User
-	result := db.Find(&users)
-	isNotFoundErr := errors.Is(result.Error, gorm.ErrRecordNotFound)
-	err := result.Error
+	err := db.Model(&database.User{}).Preload("TrimmedLinks").Find(&users).Error
+	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
 	return isNotFoundErr, users, err
 }
 
 func (userRepo *UserRepository) CreateUser(userDto *CreateUserDto) (bool, database.User, error) {
+
 	user := database.User{Username: userDto.Username,
 		Email:    userDto.Email,
 		Password: userDto.Password}
-	result := db.Or(database.User{Username: userDto.Username,
-		Email: userDto.Email}).FirstOrCreate(&user)
-	userAlreadyExists := user.ID == 0
 
-	fmt.Println(userAlreadyExists)
-	return userAlreadyExists, user, result.Error
+	userAlreadyExists := userRepo.UserExistsWithUsernameOrEmail(userDto.Username, user.Email)
+
+	if !userAlreadyExists {
+		result := db.Create(&user)
+
+		return userAlreadyExists, user, result.Error
+	}
+
+	return userAlreadyExists, user, nil
+
+}
+
+func (userRepo *UserRepository) UserExistsWithUsernameOrEmail(username, email string) bool {
+	var exists bool
+	db.Model(&database.User{}).Select("count(*) > 0").Where("username = ? or email = ?", username, email).Find(&exists)
+	return exists
 }

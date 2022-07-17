@@ -12,7 +12,9 @@ func Connect() *gorm.DB {
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  global.Env("DB_URL"),
 		PreferSimpleProtocol: true,
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		SkipDefaultTransaction: true,
+	})
 
 	if err != nil {
 		panic(err)
