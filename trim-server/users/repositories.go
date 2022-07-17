@@ -22,9 +22,8 @@ func InitializeUserRepository(db_driver *gorm.DB) {
 
 func (userRepo *UserRepository) FindUserById(id uint) (bool, database.User, error) {
 	var user database.User
-	result := db.Take(&user, id)
-	isNotFoundErr := errors.Is(result.Error, gorm.ErrRecordNotFound)
-	err := result.Error
+	err := db.Model(&database.User{}).Preload("TrimmedLinks").Take(&user, id).Error
+	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
 	return isNotFoundErr, user, err
 }
 

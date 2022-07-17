@@ -28,7 +28,11 @@ func (userController *UserController) GetUser(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"user_id": user.ID, "username": user.Username, "email": user.Email})
+	context.JSON(http.StatusOK, gin.H{
+		"user_id":       user.ID,
+		"username":      user.Username,
+		"email":         user.Email,
+		"trimmed_links": user.TrimmedLinks})
 
 }
 
@@ -73,8 +77,9 @@ func (userController *UserController) Create(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "user successfully created",
 		"user": gin.H{
-			"user_id":  user.ID,
-			"username": user.Username,
-			"email":    user.Email}})
+			"user_id":       user.ID,
+			"username":      user.Username,
+			"email":         user.Email,
+			"trimmed_links": user.TrimmedLinks}})
 
 }
