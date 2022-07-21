@@ -1,11 +1,22 @@
 package trimmedlinks
 
-import "github.com/gin-gonic/gin"
+import (
+	"example/trim-server/shared/middlewares"
+	"example/trim-server/shared/orm"
+	"example/trim-server/shared/uuid"
 
-var trimmedLinkController = new(TrimmedLinkController)
+	"github.com/gin-gonic/gin"
+)
 
-func Routes(router *gin.RouterGroup) {
-	router.GET(":id", trimmedLinkController.GetTrimmedLink)
-	router.POST("create", trimmedLinkController.CreateTrimmedLink)
+func Routes(apiRouter *gin.RouterGroup, indexRouter *gin.Engine) {
+
+	trimmedLinkController := TrimmedLinkController{
+		&TrimmedLinkService{
+			&TrimmedLinkRepository{orm.Driver},
+			&uuid.UUIDService{},
+		}}
+
+	indexRouter.GET(":link_uuid", trimmedLinkController.RedirectToOrignalLink)
+	apiRouter.POST("create", middlewares.Authentize(), trimmedLinkController.CreateTrimmedLink)
 
 }

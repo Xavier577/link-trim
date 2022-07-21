@@ -1,27 +1,23 @@
 package users
 
 import (
-	"example/trim-server/global"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-var userService = new(UserService)
+type UserController struct {
+	userService IUserService
+}
 
-type UserController struct{}
+func (userController *UserController) GetAuthenticatedUser(context *gin.Context) {
 
-func (userController *UserController) GetUser(context *gin.Context) {
+	var user_id, _ = context.Get("user_id")
 
-	userId, paramTypeErr := global.StringToUInt(context.Param("id"))
+	userId := uint(user_id.(float64))
 
-	isNotFoundErr, user, err := userService.FindUser(userId)
-
-	if isNotFoundErr || paramTypeErr != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "invalid request param"})
-		return
-	}
+	_, user, err := userController.userService.FindUser(userId)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
@@ -36,8 +32,12 @@ func (userController *UserController) GetUser(context *gin.Context) {
 
 }
 
+// @Summary get all the users in the database
+// @Produce json
+// @Success 200 {array} models.User
+// @Router /api/v1/user/all [get]
 func (userController *UserController) GetAllUsers(context *gin.Context) {
-	isNotFoundErr, users, err := userService.FindMany()
+	isNotFoundErr, users, err := userController.userService.FindMany()
 
 	if isNotFoundErr {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "no users in the database"})
@@ -46,7 +46,7 @@ func (userController *UserController) GetAllUsers(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
-		log.Default().Println(err.Error())
+		log.Println(err.Error())
 		return
 	}
 
@@ -62,7 +62,7 @@ func (userController *UserController) Create(context *gin.Context) {
 		return
 	}
 
-	userAlreadyExists, user, err := userService.CreateUser(&userDto)
+	userAlreadyExists, user, err := userController.userService.CreateUser(&userDto)
 
 	if userAlreadyExists {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "user already exists"})

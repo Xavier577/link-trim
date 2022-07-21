@@ -2,40 +2,34 @@ package trimmedlinks
 
 import (
 	"errors"
-	"example/trim-server/database"
 
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
-
-func InitializeLinkRepository(db_driver *gorm.DB) {
-	db = db_driver
-	err := db_driver.AutoMigrate(&database.TrimmedLink{})
-
-	if err != nil {
-		panic(err)
-	}
+type TrimmedLinkRepository struct {
+	dbClient *gorm.DB
 }
 
-type TrimmedLinkRepository struct{}
+type ITrimmedLinkRepository interface {
+	CreateTrimmedLink(createLinkDto *CreateTrimmedLinkDto) (TrimmedLink, error)
+	FindOriginalLink(trimmedLinkUUID string) (bool, TrimmedLink, error)
+}
 
-func (linkRepo *TrimmedLinkRepository) CreatedTrimmedLink(createLinkDto *CreateTrimmedLinkDto) (database.TrimmedLink, error) {
-	trimmedLink := database.TrimmedLink{UserId: createLinkDto.UserId,
+func (linkRepo *TrimmedLinkRepository) CreateTrimmedLink(createLinkDto *CreateTrimmedLinkDto) (TrimmedLink, error) {
+	trimmedLink := TrimmedLink{UserId: createLinkDto.UserId,
 		Link:    createLinkDto.LinkUrl,
 		Trimmed: createLinkDto.TrimmedUrl}
 
-	result := db.Create(&trimmedLink)
+	result := linkRepo.dbClient.Create(&trimmedLink)
 
 	return trimmedLink, result.Error
 
 }
 
-func (linkRepo *TrimmedLinkRepository) FindTrimmedLink(id uint) (bool, database.TrimmedLink, error) {
-	var trimmedLink database.TrimmedLink
-	result := db.First(trimmedLink, &database.TrimmedLink{ID: id})
-	isNotFoundErr := errors.Is(result.Error, gorm.ErrRecordNotFound)
-	err := result.Error
+func (linkRepo *TrimmedLinkRepository) FindOriginalLink(trimmedLinkUUID string) (bool, TrimmedLink, error) {
+	var trimmedLink TrimmedLink
+	err := linkRepo.dbClient.Select("link").First(&trimmedLink, &TrimmedLink{Trimmed: trimmedLinkUUID}).Error
+	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
 	return isNotFoundErr, trimmedLink, err
 }
 

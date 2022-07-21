@@ -2,7 +2,7 @@ package global
 
 import "strconv"
 
-func StringToUInt(value string) (uint, error) {
+func ToUInt(value string) (uint, error) {
 	var valueUInt uint
 
 	valueInt, TypeErr := strconv.Atoi(value)

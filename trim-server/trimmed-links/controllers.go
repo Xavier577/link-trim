@@ -1,20 +1,59 @@
 package trimmedlinks
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type TrimmedLinkController struct{}
-
-var trimmedLinkService = new(TrimmedLinkService)
-
-func (trimmedLinkController *TrimmedLinkController) GetTrimmedLink(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{"message": "comming soon"})
+type TrimmedLinkController struct {
+	trimmedLinkService ITrimmedLinkService
 }
 
-func (UserController *TrimmedLinkController) CreateTrimmedLink(context *gin.Context) {
+// @Summary redirect to the original link from the uuid
+// @ID redirect-to-original-link
+// @Produce json
+// @Param link_uuid path string true "short uuid"
+// @Success 300
+// @Failure 404
+// @Router /:link_uuid [get]
+func (TLC *TrimmedLinkController) RedirectToOrignalLink(context *gin.Context) {
+
+	linkUUID := context.Param("link_uuid")
+
+	if linkUUID == "" {
+
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid url"})
+
+		return
+	}
+
+	isNotFoundErr, trimmedLink, err := TLC.trimmedLinkService.FetchOriginalLink(linkUUID)
+
+	if isNotFoundErr {
+		context.JSON(http.StatusNotFound, "not Found")
+
+		return
+	}
+
+	if err != nil {
+
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+		log.Fatal(err.Error())
+
+		return
+	}
+
+	context.Redirect(http.StatusMovedPermanently, trimmedLink.Link)
+
+}
+
+func (TLC *TrimmedLinkController) CreateTrimmedLink(context *gin.Context) {
+
+	var user_id, _ = context.Get("user_id")
+
+	userId := uint(user_id.(float64))
 
 	var createTrimmedLinkDto *CreateTrimmedLinkDto
 
@@ -23,7 +62,9 @@ func (UserController *TrimmedLinkController) CreateTrimmedLink(context *gin.Cont
 		return
 	}
 
-	trimmedLink, err := trimmedLinkService.CreateTrimmedLink(createTrimmedLinkDto)
+	createTrimmedLinkDto.UserId = userId
+
+	trimmedLink, err := TLC.trimmedLinkService.CreateTrimmedLink(createTrimmedLinkDto)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error!"})

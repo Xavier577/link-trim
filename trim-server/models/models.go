@@ -1,4 +1,4 @@
-package database
+package models
 
 type TrimmedLink struct {
 	ID      uint `gorm:"primaryKey"`
@@ -8,9 +8,9 @@ type TrimmedLink struct {
 }
 
 type User struct {
-	ID           uint `gorm:"primaryKey"`
-	Username     string
-	Email        string
+	ID           uint   `gorm:"primaryKey"`
+	Username     string `gorm:"unique"`
+	Email        string `gorm:"unique"`
 	Password     string
 	TrimmedLinks []TrimmedLink
 }

@@ -1,13 +1,21 @@
 package users
 
 import (
+	"example/trim-server/shared/hasher"
+	"example/trim-server/shared/middlewares"
+	"example/trim-server/shared/orm"
+
 	"github.com/gin-gonic/gin"
 )
 
-var userController = new(UserController)
-
 func Routes(router *gin.RouterGroup) {
-	router.GET("all", userController.GetAllUsers)
-	router.GET(":id", userController.GetUser)
-	router.POST("create", userController.Create)
+
+	userController := UserController{
+		&UserService{
+			&UserRepository{orm.Driver},
+			&hasher.HashService{}}}
+
+	// router.GET("all", userController.GetAllUsers)
+	router.GET("/", middlewares.Authentize(), userController.GetAuthenticatedUser)
+	// router.POST("create", userController.Create)
 }

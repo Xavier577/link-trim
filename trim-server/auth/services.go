@@ -1,29 +1,67 @@
 package auth
 
 import (
-	"fmt"
+	"example/trim-server/global"
+	"example/trim-server/shared/hasher"
+	"example/trim-server/shared/tokenizer"
+	"example/trim-server/users"
+	"time"
 )
 
-var fakeUser = map[string]string{"email": "josephtsegen10@gmail.com", "password": "1234"}
-
-type MyError struct {
-	reason string
+type AuthService struct {
+	userRepository users.IUserRepository
+	hashService    hasher.IHashService
 }
 
-func (e *MyError) Error() string {
-	return fmt.Sprintf("%v", e.reason)
+type IAuthService interface {
+	ValidateUser(userQueryParam UserQueryParam, pass string) (bool, UserPayload, error)
+
+	Register(createUserDto users.CreateUserDto) (bool, users.User, error)
+
+	AssignToken(payload tokenizer.JWTPayload) (string, error)
 }
 
-func LoginService(loginCred *LoginCredentials) bool {
+type UserQueryParam struct {
+	Email    string
+	Username string
+}
 
-	fmt.Println(loginCred)
+type UserPayload struct {
+	UserId uint
+}
 
-	valid := false
+func (authService *AuthService) Register(createUserDto users.CreateUserDto) (bool, users.User, error) {
+	return authService.userRepository.CreateUser(&createUserDto)
+}
 
-	if loginCred.Email == fakeUser["email"] && loginCred.Password == fakeUser["password"] {
-		valid = true
+func (authService *AuthService) ValidateUser(userQueryParam UserQueryParam, pass string) (bool, UserPayload, error) {
+	var isValid bool
+	var internalError error
+	var userPayload UserPayload
+
+	isNotFoundErr, user, err := authService.userRepository.FindUserByEmailOrUsername(userQueryParam.Email, userQueryParam.Username)
+
+	if isNotFoundErr {
+		isValid = false
 	}
 
-	return valid
+	if err != nil && !isNotFoundErr {
+		internalError = err
+	}
+
+	if passMatch := authService.hashService.Compare(pass, user.Password); passMatch {
+		isValid = true
+		userPayload.UserId = user.ID
+	}
+
+	return isValid, userPayload, internalError
+}
+
+func (authSerice *AuthService) AssignToken(payload tokenizer.JWTPayload) (string, error) {
+	return tokenizer.GenerateHS256Token(tokenizer.TokenGenOptions{
+		Payload:    payload,
+		Secret:     global.Env("JWT_SECRET"),
+		ExpiryDate: time.Now().Add(time.Duration(time.Second) * global.TOKEN_HOUR_LIFESPAN),
+	})
 
 }

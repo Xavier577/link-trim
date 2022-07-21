@@ -12,7 +12,7 @@ func Env(env string) string {
 
 	envVars := map[string]string{
 		"ADDRESS":    os.Getenv("ADDRESS"),
-		"JWT_SECRET": os.Getenv("JWT_Secret"),
+		"JWT_SECRET": os.Getenv("JWT_SECRET"),
 		"DB_URL":     os.Getenv("DB_URL"),
 	}
 

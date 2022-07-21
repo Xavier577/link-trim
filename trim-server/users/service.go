@@ -1,25 +1,31 @@
 package users
 
 import (
-	"example/trim-server/database"
-	"example/trim-server/hasher"
+	"example/trim-server/shared/hasher"
 	"fmt"
 )
 
-type UserService struct{}
-
-var userRepository = new(UserRepository)
-
-func (userService *UserService) FindUser(id uint) (bool, database.User, error) {
-	return userRepository.FindUserById(id)
+type UserService struct {
+	userRepository IUserRepository
+	hashService    hasher.IHashService
 }
 
-func (UserService *UserService) FindMany() (bool, []database.User, error) {
-	return userRepository.FindMany()
+type IUserService interface {
+	FindUser(id uint) (bool, User, error)
+	FindMany() (bool, []User, error)
+	CreateUser(userDto *CreateUserDto) (bool, User, error)
 }
 
-func (userService *UserService) CreateUser(userDto *CreateUserDto) (bool, database.User, error) {
-	passHash, err := hasher.Hash(userDto.Password)
+func (US *UserService) FindUser(id uint) (bool, User, error) {
+	return US.userRepository.FindUserById(id)
+}
+
+func (US *UserService) FindMany() (bool, []User, error) {
+	return US.userRepository.FindMany()
+}
+
+func (US *UserService) CreateUser(userDto *CreateUserDto) (bool, User, error) {
+	passHash, err := US.hashService.Hash(userDto.Password)
 
 	if err != nil {
 		fmt.Println("hash error")
@@ -28,6 +34,6 @@ func (userService *UserService) CreateUser(userDto *CreateUserDto) (bool, databa
 
 	userDto.Password = passHash
 
-	return userRepository.CreateUser(userDto)
+	return US.userRepository.CreateUser(userDto)
 
 }

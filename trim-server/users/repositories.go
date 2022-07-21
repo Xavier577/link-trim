@@ -2,48 +2,74 @@ package users
 
 import (
 	"errors"
-	"example/trim-server/database"
 
 	"gorm.io/gorm"
 )
 
-type UserRepository struct{}
-
-var db *gorm.DB
-
-func InitializeUserRepository(db_driver *gorm.DB) {
-	db = db_driver
-	err := db_driver.AutoMigrate(&database.User{})
-
-	if err != nil {
-		panic(err)
-	}
+type UserRepository struct {
+	DbClient *gorm.DB
 }
 
-func (userRepo *UserRepository) FindUserById(id uint) (bool, database.User, error) {
-	var user database.User
-	err := db.Model(&database.User{}).Preload("TrimmedLinks").Take(&user, id).Error
+type IUserRepository interface {
+	FindUserById(id uint) (bool, User, error)
+
+	FindUserByEmail(email string) (bool, User, error)
+
+	FindUserByUsername(username string) (bool, User, error)
+
+	FindUserByEmailOrUsername(email string, username string) (bool, User, error)
+
+	FindMany() (bool, []User, error)
+
+	CreateUser(userDto *CreateUserDto) (bool, User, error)
+}
+
+func (userRepo *UserRepository) FindUserById(id uint) (bool, User, error) {
+	var user User
+	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Take(&user, id).Error
 	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
 	return isNotFoundErr, user, err
 }
 
-func (userRepo *UserRepository) FindMany() (bool, []database.User, error) {
-	var users []database.User
-	err := db.Model(&database.User{}).Preload("TrimmedLinks").Find(&users).Error
+func (userRepo *UserRepository) FindUserByEmailOrUsername(email string, username string) (bool, User, error) {
+	var user User
+	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Where(User{Email: email}).
+		Or(User{Username: username}).Take(&user).Error
+	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
+	return isNotFoundErr, user, err
+}
+
+func (userRepo *UserRepository) FindUserByEmail(email string) (bool, User, error) {
+	var user User
+	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Take(&user, User{Email: email}).Error
+	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
+	return isNotFoundErr, user, err
+}
+
+func (userRepo *UserRepository) FindUserByUsername(username string) (bool, User, error) {
+	var user User
+	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Take(&user, User{Username: username}).Error
+	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
+	return isNotFoundErr, user, err
+}
+
+func (userRepo *UserRepository) FindMany() (bool, []User, error) {
+	var users []User
+	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Find(&users).Error
 	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
 	return isNotFoundErr, users, err
 }
 
-func (userRepo *UserRepository) CreateUser(userDto *CreateUserDto) (bool, database.User, error) {
+func (userRepo *UserRepository) CreateUser(userDto *CreateUserDto) (bool, User, error) {
 
-	user := database.User{Username: userDto.Username,
+	user := User{Username: userDto.Username,
 		Email:    userDto.Email,
 		Password: userDto.Password}
 
 	userAlreadyExists := userRepo.UserExistsWithUsernameOrEmail(userDto.Username, user.Email)
 
 	if !userAlreadyExists {
-		result := db.Create(&user)
+		result := userRepo.DbClient.Create(&user)
 
 		return userAlreadyExists, user, result.Error
 	}
@@ -54,6 +80,6 @@ func (userRepo *UserRepository) CreateUser(userDto *CreateUserDto) (bool, databa
 
 func (userRepo *UserRepository) UserExistsWithUsernameOrEmail(username, email string) bool {
 	var exists bool
-	db.Model(&database.User{}).Select("count(*) > 0").Where("username = ? or email = ?", username, email).Find(&exists)
+	userRepo.DbClient.Model(&User{}).Select("count(*) > 0").Where("username = ? or email = ?", username, email).Find(&exists)
 	return exists
 }
