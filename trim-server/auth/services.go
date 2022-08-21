@@ -27,7 +27,7 @@ type UserQueryParam struct {
 }
 
 type UserPayload struct {
-	UserId uint
+	UserId string
 }
 
 func (authService *AuthService) Register(createUserDto users.CreateUserDto) (bool, users.User, error) {
@@ -51,7 +51,7 @@ func (authService *AuthService) ValidateUser(userQueryParam UserQueryParam, pass
 
 	if passMatch := authService.hashService.Compare(pass, user.Password); passMatch {
 		isValid = true
-		userPayload.UserId = user.ID
+		userPayload.UserId = user.UserId
 	}
 
 	return isValid, userPayload, internalError

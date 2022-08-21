@@ -23,12 +23,11 @@ func (linkRepo *TrimmedLinkRepository) CreateTrimmedLink(createLinkDto *CreateTr
 	result := linkRepo.dbClient.Create(&trimmedLink)
 
 	return trimmedLink, result.Error
-
 }
 
 func (linkRepo *TrimmedLinkRepository) FindOriginalLink(trimmedLinkUUID string) (bool, TrimmedLink, error) {
 	var trimmedLink TrimmedLink
-	err := linkRepo.dbClient.Select("link").First(&trimmedLink, &TrimmedLink{Trimmed: trimmedLinkUUID}).Error
+	err := linkRepo.dbClient.Select("link").First(&trimmedLink, TrimmedLink{Trimmed: trimmedLinkUUID}).Error
 	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
 	return isNotFoundErr, trimmedLink, err
 }

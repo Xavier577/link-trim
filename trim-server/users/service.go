@@ -2,7 +2,6 @@ package users
 
 import (
 	"example/trim-server/shared/hasher"
-	"fmt"
 )
 
 type UserService struct {
@@ -11,13 +10,15 @@ type UserService struct {
 }
 
 type IUserService interface {
-	FindUser(id uint) (bool, User, error)
+	FindUser(userId string) (bool, User, error)
+
 	FindMany() (bool, []User, error)
+
 	CreateUser(userDto *CreateUserDto) (bool, User, error)
 }
 
-func (US *UserService) FindUser(id uint) (bool, User, error) {
-	return US.userRepository.FindUserById(id)
+func (US *UserService) FindUser(userId string) (bool, User, error) {
+	return US.userRepository.FindUserById(userId)
 }
 
 func (US *UserService) FindMany() (bool, []User, error) {
@@ -28,8 +29,9 @@ func (US *UserService) CreateUser(userDto *CreateUserDto) (bool, User, error) {
 	passHash, err := US.hashService.Hash(userDto.Password)
 
 	if err != nil {
-		fmt.Println("hash error")
-		panic(err.Error())
+		var user User
+		return false, user, err
+
 	}
 
 	userDto.Password = passHash

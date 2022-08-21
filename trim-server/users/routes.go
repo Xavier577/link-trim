@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Routes(router *gin.RouterGroup) {
+func Routes(r *gin.RouterGroup) {
 
 	userController := UserController{
 		&UserService{
@@ -16,6 +16,6 @@ func Routes(router *gin.RouterGroup) {
 			&hasher.HashService{}}}
 
 	// router.GET("all", userController.GetAllUsers)
-	router.GET("/", middlewares.Authentize(), userController.GetAuthenticatedUser)
+	r.GET("/", middlewares.Authenticate(), userController.GetAuthenticatedUser)
 	// router.POST("create", userController.Create)
 }

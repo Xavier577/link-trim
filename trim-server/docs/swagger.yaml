@@ -1,32 +1,88 @@
 basePath: /
 definitions:
+  auth.AuthFailureResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  auth.LoginDto:
+    properties:
+      Indentifier:
+        type: string
+      password:
+        type: string
+    required:
+    - Indentifier
+    - password
+    type: object
+  auth.LoginSuccessResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+      token:
+        type: string
+    type: object
+  auth.SignUpSuccess:
+    properties:
+      message:
+        type: string
+      user:
+        properties:
+          email:
+            type: string
+          trimmed_links:
+            items:
+              $ref: '#/definitions/models.TrimmedLink'
+            type: array
+          user_id:
+            type: string
+          username:
+            type: string
+        type: object
+    type: object
   models.TrimmedLink:
     properties:
-      id:
-        type: integer
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
       link:
         type: string
+      pk:
+        type: integer
       trimmed:
         type: string
       userId:
-        type: integer
+        type: string
     type: object
-  models.User:
+  trimmedlinks.CreateTrimmedLinkDto:
+    properties:
+      link_url:
+        type: string
+      trimmedUrl:
+        type: string
+      userId:
+        type: string
+    required:
+    - link_url
+    type: object
+  users.CreateUserDto:
     properties:
       email:
         type: string
-      id:
-        type: integer
       password:
         type: string
-      trimmedLinks:
-        items:
-          $ref: '#/definitions/models.TrimmedLink'
-        type: array
       username:
         type: string
+    required:
+    - email
+    - password
+    - username
     type: object
-host: localhost:8080
 info:
   contact:
     email: support@swagger.io
@@ -57,16 +113,76 @@ paths:
         "404":
           description: ""
       summary: redirect to the original link from the uuid
-  /api/v1/user/all:
-    get:
+      tags:
+      - Index
+  /auth/login:
+    post:
+      operationId: login
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginDto'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/models.User'
-            type: array
-      summary: get all the users in the database
+            $ref: '#/definitions/auth.LoginSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.AuthFailureResponse'
+      summary: this endpoint enable the user to login
+      tags:
+      - Authentication
+  /auth/sign-up:
+    post:
+      operationId: Register
+      parameters:
+      - description: user information
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/users.CreateUserDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.SignUpSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.AuthFailureResponse'
+      summary: endpoint enable users to register
+      tags:
+      - Authentication
+  /link:
+    post:
+      operationId: Create_Link
+      parameters:
+      - description: url info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/trimmedlinks.CreateTrimmedLinkDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: ""
+      summary: endpoints create identifier for a link on server
+      tags:
+      - Links
 swagger: "2.0"

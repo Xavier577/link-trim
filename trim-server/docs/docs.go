@@ -29,6 +29,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "Index"
+                ],
                 "summary": "redirect to the original link from the uuid",
                 "operationId": "redirect-to-original-link",
                 "parameters": [
@@ -50,61 +53,237 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/user/all": {
-            "get": {
+        "/auth/login": {
+            "post": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "get all the users in the database",
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "this endpoint enable the user to login",
+                "operationId": "login",
+                "parameters": [
+                    {
+                        "description": "Login Credentials",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.LoginDto"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.User"
-                            }
+                            "$ref": "#/definitions/auth.LoginSuccessResponse"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/auth.AuthFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sign-up": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "endpoint enable users to register",
+                "operationId": "Register",
+                "parameters": [
+                    {
+                        "description": "user information",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/users.CreateUserDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/auth.SignUpSuccess"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/auth.AuthFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/link": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Links"
+                ],
+                "summary": "endpoints create identifier for a link on server",
+                "operationId": "Create_Link",
+                "parameters": [
+                    {
+                        "description": "url info",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/trimmedlinks.CreateTrimmedLinkDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": ""
                     }
                 }
             }
         }
     },
     "definitions": {
+        "auth.AuthFailureResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.LoginDto": {
+            "type": "object",
+            "required": [
+                "Indentifier",
+                "password"
+            ],
+            "properties": {
+                "Indentifier": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.LoginSuccessResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.SignUpSuccess": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string"
+                        },
+                        "trimmed_links": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TrimmedLink"
+                            }
+                        },
+                        "user_id": {
+                            "type": "string"
+                        },
+                        "username": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "models.TrimmedLink": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
+                "createdAt": {
+                    "type": "string"
+                },
+                "deletedAt": {
+                    "type": "string"
                 },
                 "link": {
                     "type": "string"
+                },
+                "pk": {
+                    "type": "integer"
                 },
                 "trimmed": {
                     "type": "string"
                 },
                 "userId": {
-                    "type": "integer"
+                    "type": "string"
                 }
             }
         },
-        "models.User": {
+        "trimmedlinks.CreateTrimmedLinkDto": {
             "type": "object",
+            "required": [
+                "link_url"
+            ],
+            "properties": {
+                "link_url": {
+                    "type": "string"
+                },
+                "trimmedUrl": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "users.CreateUserDto": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "id": {
-                    "type": "integer"
-                },
                 "password": {
                     "type": "string"
-                },
-                "trimmedLinks": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.TrimmedLink"
-                    }
                 },
                 "username": {
                     "type": "string"
@@ -117,7 +296,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Trim-Sever",

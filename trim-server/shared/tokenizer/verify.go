@@ -2,7 +2,6 @@ package tokenizer
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -22,7 +21,7 @@ func VerifyToken(tokenVerifyOptions TokenVerifyOptions) (bool, JWTClaim, error) 
 	token, err := jwt.ParseWithClaims(
 		tokenVerifyOptions.SignedToken,
 		&JWTClaim{},
-		func(t *jwt.Token) (interface{}, error) {
+		func(t *jwt.Token) (any, error) {
 			return []byte(tokenVerifyOptions.Secret), nil
 		},
 	)
@@ -33,7 +32,6 @@ func VerifyToken(tokenVerifyOptions TokenVerifyOptions) (bool, JWTClaim, error) 
 	}
 
 	if claims, ok := token.Claims.(*JWTClaim); ok && token.Valid {
-		fmt.Println(claims.Payload)
 		isValid = true
 		jwtClaim = *claims
 	} else if !ok {

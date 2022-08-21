@@ -8,13 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Routes(router *gin.RouterGroup) {
+func Routes(r *gin.RouterGroup) {
 
 	authController := AuthController{&AuthService{
 		&users.UserRepository{DbClient: orm.Driver},
 		&hasher.HashService{}}}
 
-	router.POST("login", authController.Login)
-	router.POST("sign-up", authController.SignUP)
+	r.POST("login", authController.Login)
+	r.POST("sign-up", authController.SignUP)
 
 }

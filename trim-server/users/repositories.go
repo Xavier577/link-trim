@@ -11,7 +11,7 @@ type UserRepository struct {
 }
 
 type IUserRepository interface {
-	FindUserById(id uint) (bool, User, error)
+	FindUserById(id string) (bool, User, error)
 
 	FindUserByEmail(email string) (bool, User, error)
 
@@ -24,9 +24,9 @@ type IUserRepository interface {
 	CreateUser(userDto *CreateUserDto) (bool, User, error)
 }
 
-func (userRepo *UserRepository) FindUserById(id uint) (bool, User, error) {
+func (userRepo *UserRepository) FindUserById(userId string) (bool, User, error) {
 	var user User
-	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Take(&user, id).Error
+	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Take(&user, User{UserId: userId}).Error
 	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
 	return isNotFoundErr, user, err
 }

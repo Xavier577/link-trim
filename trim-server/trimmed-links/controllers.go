@@ -12,6 +12,7 @@ type TrimmedLinkController struct {
 }
 
 // @Summary redirect to the original link from the uuid
+// @Tags Index
 // @ID redirect-to-original-link
 // @Produce json
 // @Param link_uuid path string true "short uuid"
@@ -24,7 +25,7 @@ func (TLC *TrimmedLinkController) RedirectToOrignalLink(context *gin.Context) {
 
 	if linkUUID == "" {
 
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid url"})
+		context.JSON(http.StatusBadRequest, gin.H{"message": "INVALID_URL"})
 
 		return
 	}
@@ -32,14 +33,14 @@ func (TLC *TrimmedLinkController) RedirectToOrignalLink(context *gin.Context) {
 	isNotFoundErr, trimmedLink, err := TLC.trimmedLinkService.FetchOriginalLink(linkUUID)
 
 	if isNotFoundErr {
-		context.JSON(http.StatusNotFound, "not Found")
+		context.JSON(http.StatusNotFound, "NOT_FOUND")
 
 		return
 	}
 
 	if err != nil {
 
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error"})
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "INTERNAL_SERVER_ERROR"})
 		log.Fatal(err.Error())
 
 		return
@@ -49,11 +50,17 @@ func (TLC *TrimmedLinkController) RedirectToOrignalLink(context *gin.Context) {
 
 }
 
+// @Summary endpoints create identifier for a link on server
+// @Tags Links
+// @ID Create_Link
+// @Produce json
+// @Param data body CreateTrimmedLinkDto true "url info"
+// @Success 200 {string} link_id
+// @Failure 400
+// @Router /link [post]
 func (TLC *TrimmedLinkController) CreateTrimmedLink(context *gin.Context) {
 
-	var user_id, _ = context.Get("user_id")
-
-	userId := uint(user_id.(float64))
+	var userId, _ = context.Get("user_id")
 
 	var createTrimmedLinkDto *CreateTrimmedLinkDto
 
@@ -62,12 +69,13 @@ func (TLC *TrimmedLinkController) CreateTrimmedLink(context *gin.Context) {
 		return
 	}
 
-	createTrimmedLinkDto.UserId = userId
+	createTrimmedLinkDto.UserId = userId.(string)
 
 	trimmedLink, err := TLC.trimmedLinkService.CreateTrimmedLink(createTrimmedLinkDto)
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Internal server error!"})
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "INTERNAL_SERVER_ERROR"})
+		log.Fatal(err.Error())
 		return
 	}
 

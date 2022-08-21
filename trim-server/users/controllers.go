@@ -13,11 +13,9 @@ type UserController struct {
 
 func (userController *UserController) GetAuthenticatedUser(context *gin.Context) {
 
-	var user_id, _ = context.Get("user_id")
+	var userId, _ = context.Get("user_id")
 
-	userId := uint(user_id.(float64))
-
-	_, user, err := userController.userService.FindUser(userId)
+	_, user, err := userController.userService.FindUser(userId.(string))
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
@@ -25,39 +23,48 @@ func (userController *UserController) GetAuthenticatedUser(context *gin.Context)
 	}
 
 	context.JSON(http.StatusOK, gin.H{
-		"user_id":       user.ID,
+		"user_id":       user.UserId,
 		"username":      user.Username,
 		"email":         user.Email,
 		"trimmed_links": user.TrimmedLinks})
 
 }
 
+/*
+
 // @Summary get all the users in the database
 // @Produce json
 // @Success 200 {array} models.User
 // @Router /api/v1/user/all [get]
-func (userController *UserController) GetAllUsers(context *gin.Context) {
-	isNotFoundErr, users, err := userController.userService.FindMany()
+// func (userController *UserController) GetAllUsers(context *gin.Context) {
+// 	isNotFoundErr, users, err := userController.userService.FindMany()
 
-	if isNotFoundErr {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "no users in the database"})
-		return
-	}
+// 	if isNotFoundErr {
+// 		context.JSON(http.StatusBadRequest, gin.H{"message": "no users in the database"})
+// 		return
+// 	}
 
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
-		log.Println(err.Error())
-		return
-	}
+// 	if err != nil {
+// 		context.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
+// 		log.Println(err.Error())
+// 		return
+// 	}
 
-	context.JSON(http.StatusOK, gin.H{"data": users})
+// 	context.JSON(http.StatusOK, gin.H{"data": users})
 
-}
+// }
+
+*/
 
 func (userController *UserController) Create(context *gin.Context) {
 	var userDto CreateUserDto
 
 	if err := context.ShouldBindJSON(&userDto); err != nil {
+
+		if err.Error() == "EOF" {
+			context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		}
+
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -70,14 +77,15 @@ func (userController *UserController) Create(context *gin.Context) {
 	}
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "internal server error"})
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "INTERNAL_SERVER_ERROR"})
+		log.Fatal(err.Error())
 		return
 	}
 
 	context.JSON(http.StatusOK, gin.H{
 		"message": "user successfully created",
 		"user": gin.H{
-			"user_id":       user.ID,
+			"user_id":       user.UserId,
 			"username":      user.Username,
 			"email":         user.Email,
 			"trimmed_links": user.TrimmedLinks}})
