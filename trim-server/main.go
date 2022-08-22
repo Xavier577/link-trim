@@ -30,6 +30,10 @@ func init() {
 // @BasePath /
 // @query.collection.format multi
 
+//@securityDefinitions.apikey Authorization
+//@in header
+//@name Authorization
+
 func main() {
 	router := gin.Default()
 	config.RoutesConfig(router)

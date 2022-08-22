@@ -15,7 +15,7 @@ func Connect() *gorm.DB {
 		PreferSimpleProtocol: true,
 	}), &gorm.Config{
 		SkipDefaultTransaction: true,
-		Logger:                 logger.Default.LogMode(logger.Error),
+		Logger:                 logger.Default.LogMode(logger.Info),
 	})
 
 	if err != nil {

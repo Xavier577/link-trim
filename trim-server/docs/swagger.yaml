@@ -9,12 +9,12 @@ definitions:
     type: object
   auth.LoginDto:
     properties:
-      Indentifier:
+      identifier:
         type: string
       password:
         type: string
     required:
-    - Indentifier
+    - identifier
     - password
     type: object
   auth.LoginSuccessResponse:
@@ -185,4 +185,23 @@ paths:
       summary: endpoints create identifier for a link on server
       tags:
       - Links
+  /user:
+    get:
+      operationId: GetAuthenticated User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "401":
+          description: ""
+      security:
+      - Authorization: []
+      tags:
+      - User
+securityDefinitions:
+  Authorization:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

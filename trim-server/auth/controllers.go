@@ -30,6 +30,8 @@ func (authController *AuthController) Login(context *gin.Context) {
 		return
 	}
 
+	log.Println(loginDto)
+
 	isValid, userPayload, err := authController.authService.ValidateUser(UserQueryParam{
 		Email:    loginDto.Identifier,
 		Username: loginDto.Identifier,

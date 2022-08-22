@@ -160,6 +160,30 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user": {
+            "get": {
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "operationId": "GetAuthenticated User",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "401": {
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -177,11 +201,11 @@ const docTemplate = `{
         "auth.LoginDto": {
             "type": "object",
             "required": [
-                "Indentifier",
+                "identifier",
                 "password"
             ],
             "properties": {
-                "Indentifier": {
+                "identifier": {
                     "type": "string"
                 },
                 "password": {
@@ -289,6 +313,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "Authorization": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

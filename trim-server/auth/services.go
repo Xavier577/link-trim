@@ -5,6 +5,7 @@ import (
 	"example/trim-server/shared/hasher"
 	"example/trim-server/shared/tokenizer"
 	"example/trim-server/users"
+	"log"
 	"time"
 )
 
@@ -30,8 +31,14 @@ type UserPayload struct {
 	UserId string
 }
 
-func (authService *AuthService) Register(createUserDto users.CreateUserDto) (bool, users.User, error) {
-	return authService.userRepository.CreateUser(&createUserDto)
+func (a *AuthService) Register(createUserDto users.CreateUserDto) (bool, users.User, error) {
+	hashedPass, err := a.hashService.Hash(createUserDto.Password)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	createUserDto.Password = hashedPass
+	return a.userRepository.CreateUser(&createUserDto)
 }
 
 func (authService *AuthService) ValidateUser(userQueryParam UserQueryParam, pass string) (bool, UserPayload, error) {

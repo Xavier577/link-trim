@@ -11,6 +11,13 @@ type UserController struct {
 	userService IUserService
 }
 
+// @Tags User
+// @ID GetAuthenticated User
+// @Produce json
+// @Security Authorization
+// @Success 200
+// @Failure 401
+// @Router /user [get]
 func (userController *UserController) GetAuthenticatedUser(context *gin.Context) {
 
 	var userId, _ = context.Get("user_id")

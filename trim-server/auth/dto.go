@@ -5,7 +5,7 @@ import (
 )
 
 type LoginDto struct {
-	Identifier string `json:"Indentifier" binding:"required"`
+	Identifier string `json:"identifier" binding:"required"`
 	Password   string `json:"password" binding:"required"`
 }
 
