@@ -1,0 +1,205 @@
+basePath: /
+definitions:
+  auth.AuthFailureResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  auth.LoginDto:
+    properties:
+      identifier:
+        type: string
+      password:
+        type: string
+    required:
+    - identifier
+    - password
+    type: object
+  auth.LoginSuccessResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: string
+      token:
+        type: string
+    type: object
+  auth.SignUpSuccess:
+    properties:
+      message:
+        type: string
+      user:
+        properties:
+          email:
+            type: string
+          trimmed_links:
+            items:
+              $ref: '#/definitions/models.TrimmedLink'
+            type: array
+          user_id:
+            type: string
+          username:
+            type: string
+        type: object
+    type: object
+  models.TrimmedLink:
+    properties:
+      createdAt:
+        type: string
+      deletedAt:
+        type: string
+      link:
+        type: string
+      pk:
+        type: integer
+      trimmed:
+        type: string
+      userID:
+        type: string
+    type: object
+  trimmedlinks.CreateTrimmedLinkDto:
+    properties:
+      link_url:
+        type: string
+    required:
+    - link_url
+    type: object
+  users.CreateUserDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a simple link shortner api. You can visit the GitHub repository
+    at https://github.com/Xavier577/link-trim
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Trim-Sever
+  version: "1.0"
+paths:
+  /{link_uuid}:
+    get:
+      operationId: redirect-to-original-link
+      parameters:
+      - description: short uuid
+        in: path
+        name: link_uuid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "300":
+          description: ""
+        "404":
+          description: ""
+      summary: redirect to the original link from the uuid
+      tags:
+      - Index
+  /auth/login:
+    post:
+      operationId: login
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginSuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.AuthFailureResponse'
+      summary: this endpoint enable the user to login
+      tags:
+      - Authentication
+  /auth/sign-up:
+    post:
+      operationId: Register
+      parameters:
+      - description: user information
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/users.CreateUserDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.SignUpSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/auth.AuthFailureResponse'
+      summary: endpoint enable users to register
+      tags:
+      - Authentication
+  /trimmed-link/create:
+    post:
+      operationId: Create_Link
+      parameters:
+      - description: url info
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/trimmedlinks.CreateTrimmedLinkDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: ""
+      security:
+      - Authorization: []
+      summary: endpoints create identifier for a link on server
+      tags:
+      - Links
+  /user:
+    get:
+      operationId: GetAuthenticated User
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "401":
+          description: ""
+      security:
+      - Authorization: []
+      tags:
+      - User
+securityDefinitions:
+  Authorization:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
