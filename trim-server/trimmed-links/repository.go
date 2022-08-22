@@ -16,7 +16,7 @@ type ITrimmedLinkRepository interface {
 }
 
 func (linkRepo *TrimmedLinkRepository) CreateTrimmedLink(createLinkDto *CreateTrimmedLinkDto) (TrimmedLink, error) {
-	trimmedLink := TrimmedLink{UserId: createLinkDto.UserId,
+	trimmedLink := TrimmedLink{UserID: createLinkDto.UserId,
 		Link:    createLinkDto.LinkUrl,
 		Trimmed: createLinkDto.TrimmedUrl}
 

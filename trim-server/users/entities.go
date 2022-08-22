@@ -16,7 +16,7 @@ func (user *User) BeforeCreate(tx *gorm.DB) (err error) {
 	if err != nil {
 		return err
 	}
-	user.UserId = id.String()
+	user.UserID = id.String()
 
 	return
 }

@@ -100,7 +100,7 @@ func (authController *AuthController) SignUP(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Sign up successful",
 		"user": gin.H{
-			"user_id":       user.UserId,
+			"user_id":       user.UserID,
 			"username":      user.Username,
 			"email":         user.Email,
 			"trimmed_links": user.TrimmedLinks}})

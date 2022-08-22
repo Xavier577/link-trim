@@ -18,7 +18,7 @@ type TrimmedLinkController struct {
 // @Param link_uuid path string true "short uuid"
 // @Success 300
 // @Failure 404
-// @Router /:link_uuid [get]
+// @Router /{link_uuid} [get]
 func (TLC *TrimmedLinkController) RedirectToOrignalLink(context *gin.Context) {
 
 	linkUUID := context.Param("link_uuid")
@@ -53,11 +53,12 @@ func (TLC *TrimmedLinkController) RedirectToOrignalLink(context *gin.Context) {
 // @Summary endpoints create identifier for a link on server
 // @Tags Links
 // @ID Create_Link
+// @Security Authorization
 // @Produce json
 // @Param data body CreateTrimmedLinkDto true "url info"
 // @Success 200 {string} link_id
 // @Failure 400
-// @Router /link [post]
+// @Router /trimmed-link/create [post]
 func (TLC *TrimmedLinkController) CreateTrimmedLink(context *gin.Context) {
 
 	var userId, _ = context.Get("user_id")

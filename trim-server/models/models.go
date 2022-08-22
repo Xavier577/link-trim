@@ -4,35 +4,33 @@ import (
 	"time"
 )
 
-type TrimmedLink struct {
-	PK        uint `gorm:"primaryKey"`
-	Link      string
-	Trimmed   string
-	UserId    string
-	CreatedAt time.Time
-	DeletedAt time.Time
-}
-
 type User struct {
-	PK           uint   `gorm:"primaryKey"`
-	UserId       string `gorm:"type:uuid;unique"`
+	UserID       string `gorm:"primaryKey;type:uuid;"`
 	Username     string `gorm:"unique"`
 	Email        string `gorm:"unique"`
 	Password     string
 	Role         Role
 	Admin        Admin
-	TrimmedLinks []TrimmedLink
+	TrimmedLinks []TrimmedLink `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	CreatedAt    time.Time
 	DeletedAt    time.Time
 }
 
+type TrimmedLink struct {
+	PK        uint `gorm:"primaryKey"`
+	Link      string
+	Trimmed   string
+	UserID    string
+	CreatedAt time.Time
+	DeletedAt time.Time
+}
 type Admin struct {
 	PK     uint `gorm:"primaryKey"`
-	UserId string
+	UserID string
 }
 
 type Role struct {
 	PK     uint `gorm:"primaryKey"`
 	Type   string
-	UserId string
+	UserID string
 }

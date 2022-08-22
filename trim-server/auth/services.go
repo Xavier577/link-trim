@@ -58,7 +58,7 @@ func (authService *AuthService) ValidateUser(userQueryParam UserQueryParam, pass
 
 	if passMatch := authService.hashService.Compare(pass, user.Password); passMatch {
 		isValid = true
-		userPayload.UserId = user.UserId
+		userPayload.UserId = user.UserID
 	}
 
 	return isValid, userPayload, internalError

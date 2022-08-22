@@ -56,16 +56,12 @@ definitions:
         type: integer
       trimmed:
         type: string
-      userId:
+      userID:
         type: string
     type: object
   trimmedlinks.CreateTrimmedLinkDto:
     properties:
       link_url:
-        type: string
-      trimmedUrl:
-        type: string
-      userId:
         type: string
     required:
     - link_url
@@ -96,7 +92,7 @@ info:
   title: Trim-Sever
   version: "1.0"
 paths:
-  /:link_uuid:
+  /{link_uuid}:
     get:
       operationId: redirect-to-original-link
       parameters:
@@ -163,7 +159,7 @@ paths:
       summary: endpoint enable users to register
       tags:
       - Authentication
-  /link:
+  /trimmed-link/create:
     post:
       operationId: Create_Link
       parameters:
@@ -182,6 +178,8 @@ paths:
             type: string
         "400":
           description: ""
+      security:
+      - Authorization: []
       summary: endpoints create identifier for a link on server
       tags:
       - Links

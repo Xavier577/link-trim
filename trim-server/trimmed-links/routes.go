@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Routes(r *gin.RouterGroup) {
+func Routes(r *gin.RouterGroup, a *gin.Engine) {
 
 	trimmedLinkController := TrimmedLinkController{
 		&TrimmedLinkService{
@@ -16,7 +16,7 @@ func Routes(r *gin.RouterGroup) {
 			&uuid.UUIDService{},
 		}}
 
-	r.GET(":link_uuid", trimmedLinkController.RedirectToOrignalLink)
+	a.GET(":link_uuid", trimmedLinkController.RedirectToOrignalLink)
 	r.POST("create", middlewares.Authenticate(), trimmedLinkController.CreateTrimmedLink)
 
 }

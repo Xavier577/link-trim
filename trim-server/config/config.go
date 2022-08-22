@@ -26,6 +26,6 @@ func RoutesConfig(r *gin.Engine) {
 		r.GET("docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		auth.Routes(r.Group("/auth"))
 		users.Routes(r.Group("/user"))
-		trimmedlinks.Routes(r.Group("/trimmed-link"))
+		trimmedlinks.Routes(r.Group("/trimmed-link"), r)
 	}
 }

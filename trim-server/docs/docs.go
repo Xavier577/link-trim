@@ -24,35 +24,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/:link_uuid": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Index"
-                ],
-                "summary": "redirect to the original link from the uuid",
-                "operationId": "redirect-to-original-link",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "short uuid",
-                        "name": "link_uuid",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "300": {
-                        "description": ""
-                    },
-                    "404": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "/auth/login": {
             "post": {
                 "produces": [
@@ -127,8 +98,13 @@ const docTemplate = `{
                 }
             }
         },
-        "/link": {
+        "/trimmed-link/create": {
             "post": {
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -180,6 +156,35 @@ const docTemplate = `{
                         "description": ""
                     },
                     "401": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/{link_uuid}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Index"
+                ],
+                "summary": "redirect to the original link from the uuid",
+                "operationId": "redirect-to-original-link",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "short uuid",
+                        "name": "link_uuid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "300": {
+                        "description": ""
+                    },
+                    "404": {
                         "description": ""
                     }
                 }
@@ -273,7 +278,7 @@ const docTemplate = `{
                 "trimmed": {
                     "type": "string"
                 },
-                "userId": {
+                "userID": {
                     "type": "string"
                 }
             }
@@ -285,12 +290,6 @@ const docTemplate = `{
             ],
             "properties": {
                 "link_url": {
-                    "type": "string"
-                },
-                "trimmedUrl": {
-                    "type": "string"
-                },
-                "userId": {
                     "type": "string"
                 }
             }

@@ -26,7 +26,7 @@ type IUserRepository interface {
 
 func (userRepo *UserRepository) FindUserById(userId string) (bool, User, error) {
 	var user User
-	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Take(&user, User{UserId: userId}).Error
+	err := userRepo.DbClient.Model(&User{}).Preload("TrimmedLinks").Take(&user, User{UserID: userId}).Error
 	isNotFoundErr := errors.Is(err, gorm.ErrRecordNotFound)
 	return isNotFoundErr, user, err
 }
