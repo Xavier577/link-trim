@@ -11,7 +11,7 @@ import (
 func Connect() *gorm.DB {
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN:                  global.Env("DB_URL"),
+		DSN:                  global.Env("DATABASE_URL"),
 		PreferSimpleProtocol: true,
 	}), &gorm.Config{
 		SkipDefaultTransaction: true,
